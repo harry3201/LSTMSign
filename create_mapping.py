@@ -8,15 +8,24 @@ data_dict = pickle.load(open(r'C:\Users\harryy\Desktop\dghnisl\videoisl\preproce
 data = np.array(data_dict['data'])  # Shape: (num_samples, 30, 84)
 labels = data_dict['labels']
 
+# Define the correct label order
+ordered_labels = ["ball", "book", "clean", "cold", "deny", "grateful", "hurt", "milk", "playing games", "rice"]
+
 # Create label-to-index mapping
-unique_labels = list(set(labels))
-label_to_int = {label: idx for idx, label in enumerate(unique_labels)}
+label_to_int = {label: idx for idx, label in enumerate(ordered_labels)}
 
 # Label translations (for displaying predictions)
 label_translations = {
     "ball": {"english": "Ball", "hindi": "गेंद", "gujarati": "બોલ"},
     "book": {"english": "Book", "hindi": "पुस्तक", "gujarati": "પુસ્તક"},
-    "hurt": {"english": "Hurt", "hindi": "चोट", "gujarati": "ઈજા"}
+    "clean": {"english": "Clean", "hindi": "साफ", "gujarati": "સાફ"},
+    "cold": {"english": "Cold", "hindi": "ठंडा", "gujarati": "ઠંડો"},
+    "deny": {"english": "Deny", "hindi": "इंकार", "gujarati": "નકાર"},
+    "grateful": {"english": "Grateful", "hindi": "आभारी", "gujarati": "આભારી"},
+    "hurt": {"english": "Hurt", "hindi": "चोट", "gujarati": "ઈજા"},
+    "milk": {"english": "Milk", "hindi": "दूध", "gujarati": "દૂધ"},
+    "playing games": {"english": "Playing Games", "hindi": "खेल खेलना", "gujarati": "રમત રમી"},
+    "rice": {"english": "Rice", "hindi": "चावल", "gujarati": "ચોખા"}
 }
 
 # Save both label-to-index and translations in one file
@@ -32,7 +41,7 @@ labels_onehot = to_categorical(labels_int, num_classes=len(label_to_int))
 
 # Split data
 x_train, x_test, y_train, y_test = train_test_split(
-    data, labels_onehot, test_size=0.2, stratify=labels_onehot, shuffle=True
+    data, labels_onehot, test_size=0.2, stratify=labels_int, shuffle=True
 )
 
-print("✅ Data preprocessing complete!")
+print("✅ Data preprocessing complete! Label mapping updated.")

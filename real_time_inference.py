@@ -13,9 +13,14 @@ model = tf.keras.models.load_model(MODEL_PATH)
 # Load label mappings
 mapping_path = r'C:\Users\harryy\Desktop\dghnisl\videoisl\preprocessed_data\label_mapping.pickle'
 with open(mapping_path, 'rb') as f:
-    label_translations = pickle.load(f)
+    label_mapping = pickle.load(f)
 
-gesture_classes = list(label_translations.keys())
+# Ensure correct dictionary structure
+if 'translations' not in label_mapping or 'label_to_int' not in label_mapping:
+    raise ValueError("❌ Error: label_mapping.pickle does not contain expected keys: 'translations' and 'label_to_int'")
+
+label_translations = label_mapping['translations']  # Extract translations
+gesture_classes = list(label_mapping['label_to_int'].keys())  # Ensure correct class order
 
 # Load fonts (Increased font size for visibility)
 hindi_font = ImageFont.truetype(r'C:\Users\harryy\Desktop\dghnisl\videoisl\fonts\NotoSansDevanagari-VariableFont_wdth,wght.ttf', 40)
@@ -83,6 +88,11 @@ while cap.isOpened():
         if len(prediction_history) >= 5:  # Only consider stable predictions
             most_frequent_label = Counter(prediction_history).most_common(1)[0][0]
 
+            # Ensure the label exists in translations
+            if most_frequent_label not in label_translations:
+                print(f"⚠️ Warning: '{most_frequent_label}' not found in translations! Skipping frame.")
+                continue  # Skip this frame
+
             # Get translations
             translation = label_translations[most_frequent_label]
 
@@ -94,7 +104,11 @@ while cap.isOpened():
             positions = [(50, 50), (50, 120), (50, 190)]
             colors = [(255, 255, 255), (255, 255, 0), (0, 255, 255)]  # White, Yellow, Cyan
             fonts = [hindi_font, hindi_font, gujarati_font]
-            texts = [translation['english'], translation['hindi'], translation['gujarati']]
+            texts = [
+                translation.get('english', 'N/A'), 
+                translation.get('hindi', 'N/A'), 
+                translation.get('gujarati', 'N/A')
+            ]
 
             # Draw text with black outline for better visibility
             for (x, y), text, font, color in zip(positions, texts, fonts, colors):

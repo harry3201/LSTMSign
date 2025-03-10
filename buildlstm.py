@@ -13,18 +13,9 @@ data_dict = pickle.load(open(r'C:\Users\harryy\Desktop\dghnisl\videoisl\preproce
 data = np.array(data_dict['data'])  # Shape: (num_samples, 30, 84)
 labels = np.array(data_dict['labels'])
 
-# Create label mapping
-unique_labels = sorted(set(labels))
-label_to_int = {label: idx for idx, label in enumerate(unique_labels)}
-
-# Save label mapping
-label_translations = {
-    "ball": {"english": "Ball", "hindi": "गेंद", "gujarati": "બોલ"},
-    "book": {"english": "Book", "hindi": "पुस्तक", "gujarati": "પુસ્તક"},
-    "hurt": {"english": "Hurt", "hindi": "चोट", "gujarati": "ઈજા"}
-}
-with open(r'C:\Users\harryy\Desktop\dghnisl\videoisl\preprocessed_data\label_mapping.pickle', 'wb') as f:
-    pickle.dump(label_translations, f)
+# Load label mapping (ensuring order consistency)
+label_mapping = pickle.load(open(r'C:\Users\harryy\Desktop\dghnisl\videoisl\preprocessed_data\label_mapping.pickle', 'rb'))
+label_to_int = label_mapping["label_to_int"]
 
 # Convert labels to integers
 labels_int = np.array([label_to_int[label] for label in labels])
